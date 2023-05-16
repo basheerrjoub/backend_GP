@@ -1,0 +1,226 @@
+#Creating the mealDB
+create database mealDB;
+#Using the schema
+use mealDB;
+
+#Dropping the schema
+drop database mealDB;
+
+
+##############################################
+#                 Meals                      #
+##############################################
+
+#Create table of meals
+create table meal (
+	meal_id int primary key,
+    meal_name varchar(50),
+    meal_des varchar(300),
+    #Features of the meal
+    snack int,
+    breakfast int,
+    lunch int,
+    dinner int,
+    warm int,
+    hard int,
+    salty int,
+    sweety int,
+    spicy int
+);
+
+
+#view table of meals
+select * from meal;
+drop table meal;
+
+##############################################
+#                 Items                      #
+##############################################
+
+#Create table of Items
+create table items (
+	item_id int not null auto_increment ,
+    item_name varchar(100),
+    item_desc varchar(500),
+    weight decimal(5,2),
+    protein decimal(5,2),
+    fat decimal(5,2),
+    carbs decimal(5,2),
+    cal decimal(5,2),
+    sugar decimal(5,2),
+    vegan TINYINT(1),
+    vegetarian TINYINT(1),
+    bread TINYINT(1),
+    rice TINYINT(1),   
+    
+    primary key(item_id)
+);
+
+insert  into items(item_name,item_desc,weight,cal,protein,sugar,carbs,fats) values ("اناناس","حبة" , 155,0.8,0.2,0.3,0.7,0.0);
+select * from items ;
+Drop table items;
+#Add items
+
+#view table of meals
+select * from items;
+
+
+##############################################
+#                Meal_Item                   #
+##############################################
+
+#Create table of meal_item
+create table meal_item (
+	id int primary key,
+    meal_id int,
+    item_id int,
+    weight double,
+    foreign key(meal_id) references meals(meal_id),
+    foreign key(item_id) references items(item_id)
+);
+#Add meal_item
+insert into meal_item
+values (1, 1, 1);
+drop table meal_item;
+#view table of meal_item
+select * from meal_item;
+
+
+##############################################
+#                  Questions                 #
+##############################################
+create table questions (
+	question_id int primary key,
+    question_desc varchar(1000)
+);
+#drop table
+drop table questions;
+
+#Add Question
+insert into questions
+values (1, "Gender");
+
+#view table of meal_item
+select * from questions;
+
+
+##############################################
+#                   Users                    #
+##############################################
+create table user (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    username varchar(100),
+    first_name varchar(100),
+    last_name varchar(100),
+    last_login datetime,
+    date_joined datetime,
+    is_active boolean,
+	is_staff boolean,
+	is_superuser boolean,
+    password varchar(512) check (char_length(password) >= 8),
+    email varchar(100) check (email like '%@%.%')
+);
+
+#Add user
+-- Add user
+INSERT INTO users
+VALUES ('Basheer', NOW(), true, false, false, '11112222', 'basheer@gmail.com');
+
+INSERT INTO users
+VALUES ('Ahmad', NOW(), true, false, false, '11112222', 'ahmad@gmail.com');
+
+drop table user;
+#view table of users
+select * from user;
+delete from users where id>0;
+
+
+
+
+##############################################
+#                User_Question               #
+##############################################
+create table user_question (
+	user_question_id int primary key,
+    user_id int,
+    question_id int,
+    question_answer varchar(100),
+    foreign key(user_id) references users(user_id),
+    foreign key(question_id) references questions(question_id)    
+);
+
+
+#Add user_question relation
+insert into user_question
+values (1, "1", "1", "Female");
+drop table user_question;
+#view table of user_question relation
+select * from user_question;
+
+#################################################
+#################################################
+###                Queries                   ####
+#################################################
+#################################################
+
+
+#select the meals and there corresponding items
+SELECT meal_name, item_name
+FROM (
+    select meals.meal_name, meal_item.item_id
+	from meals inner join meal_item
+	on meals.meal_id = meal_item.meal_id
+) AS output
+INNER JOIN items
+ON output.item_id = items.item_id;
+
+
+
+#select the users and there corresponding questions
+SELECT user_id, user_name, question_desc, question_answer
+FROM (
+    SELECT users.user_id, user_name, user_password, user_email, user_question_id, question_id, question_answer
+    FROM users
+    INNER JOIN user_question
+    ON users.user_id = user_question.user_id
+) AS output
+INNER JOIN questions
+ON output.question_id = questions.question_id;
+
+
+show tables;
+
+
+
+
+
+
+#################################################
+#################################################
+###                Suggessions               ####
+#################################################
+#################################################
+CREATE TABLE suggestions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT,
+  meal_id INT,
+  suggestion_date DATETIME default NOW(),
+  FOREIGN KEY (user_id) REFERENCES user(id),
+  FOREIGN KEY (meal_id) REFERENCES meal(meal_id)
+);
+drop table suggestions;
+select * from suggestions;
+
+#User 1
+INSERT INTO suggestions (user_id, meal_id) VALUES (1, 1);
+INSERT INTO suggestions (user_id, meal_id) VALUES (1, 2);
+INSERT INTO suggestions (user_id, meal_id) VALUES (1, 3);
+INSERT INTO suggestions (user_id, meal_id) VALUES (1, 4);
+INSERT INTO suggestions (user_id, meal_id) VALUES (1, 5);
+
+#User 2
+INSERT INTO suggestions (user_id, meal_id) VALUES (2, 22);
+INSERT INTO suggestions (user_id, meal_id) VALUES (2, 13);
+INSERT INTO suggestions (user_id, meal_id) VALUES (2, 5);
+INSERT INTO suggestions (user_id, meal_id) VALUES (2, 10);
+INSERT INTO suggestions (user_id, meal_id) VALUES (2, 12);

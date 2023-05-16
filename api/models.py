@@ -58,4 +58,38 @@ class User(AbstractUser, PermissionsMixin):
         db_table = "user"
 
     def __str__(self):
-        return self.email
+        return self.username
+
+
+class Meal(models.Model):
+    meal_id = models.IntegerField(primary_key=True)
+    meal_name = models.CharField(max_length=50)
+    meal_des = models.CharField(max_length=300)
+    snack = models.IntegerField()
+    breakfast = models.IntegerField()
+    lunch = models.IntegerField()
+    dinner = models.IntegerField()
+    warm = models.IntegerField()
+    hard = models.IntegerField()
+    salty = models.IntegerField()
+    sweety = models.IntegerField()
+    spicy = models.IntegerField()
+
+    class Meta:
+        db_table = "meal"
+
+    def __str__(self):
+        return self.meal_name
+
+
+class Suggestions(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    meal = models.ForeignKey(Meal, on_delete=models.CASCADE)
+
+    suggestion_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "suggestions"
+
+    def __str__(self):
+        return f"Suggestion: {self.meal.meal_name} for User: {self.user.username}"

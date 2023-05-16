@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User
+from .models import *
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -24,3 +24,15 @@ class UserSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
+
+
+class MealSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Meal
+        fields = "__all__"
+
+
+class SuggestionsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Suggestions
+        fields = "__all__"
