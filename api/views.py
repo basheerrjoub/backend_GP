@@ -2,12 +2,8 @@ from django.shortcuts import render
 from rest_framework import generics
 from .models import *
 from .serializers import *
-from django.http import Http404
-from rest_framework.views import APIView
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 
 
 class UserList(generics.ListCreateAPIView):
@@ -40,3 +36,22 @@ class SuggestionsList(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return Meal.objects.filter(suggestions__user=user)
+
+
+class RegisterView(generics.GenericAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        return Response(
+            {
+                "user": UserSerializer(
+                    user, context=self.get_serializer_context()
+                ).data,
+                "message": "User Created Successfully.  Now perform Login to get your token",
+            }
+        )

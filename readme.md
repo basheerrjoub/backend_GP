@@ -53,3 +53,53 @@ Cross-Origin-Opener-Policy: same-origin
 ```
 If the user is verified, then a token is generated for this user, and has to send it in the following requests, so that accessing within this token the parts which user has authorization.
 
+
+
+### Register a new user 
+`POST api/register/`
+#### Request
+```
+POST /api/register/ HTTP/1.1
+Content-Type: application/json
+User-Agent: PostmanRuntime/7.32.2
+Accept: */*
+Postman-Token: 782c987c-7792-4822-bd11-f5123d6146e1
+Host: 127.0.0.1:8000
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 166
+ 
+{
+"first_name": "Ahmad",
+"last_name": "Mohammad",
+"username": "ahmadmohammad",
+"email": "ahmadmohammad@gmail.com",
+"password": "ahmad1234"
+}
+ 
+
+```
+
+
+### Response
+```
+HTTP/1.1 200 OK
+Date: Sun, 21 May 2023 11:34:11 GMT
+Server: WSGIServer/0.2 CPython/3.11.3
+Content-Type: application/json
+Vary: Accept
+Allow: POST, OPTIONS
+X-Frame-Options: DENY
+Content-Length: 191
+X-Content-Type-Options: nosniff
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+ 
+{"user":{"first_name":"Ahmad","last_name":"mohammad","username":"ahmadmohammad","email":"ahmadmohammad@gmail.com"},"message":"User Created Successfully. Now perform Login to get your token"}
+
+
+```
+Take care, that the email should be unique.
+
+
+

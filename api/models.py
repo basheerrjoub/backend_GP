@@ -39,12 +39,10 @@ class User(AbstractUser, PermissionsMixin):
     username = models.CharField(max_length=100)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    password = models.CharField(
-        max_length=100
-    )  # This will not be used in Django authentication
+    password = models.CharField(max_length=100)
     email = models.EmailField(max_length=100, unique=True)
-    last_login = models.DateTimeField()
-    date_joined = models.DateTimeField()
+    last_login = models.DateTimeField(auto_now=True)
+    date_joined = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
