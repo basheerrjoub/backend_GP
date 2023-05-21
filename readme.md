@@ -13,8 +13,7 @@ This is the API's Documentation.
 ## REST API's Docummentaion
 
 ### Login a registered user 
-
-![](https://img.shields.io/badge/POST:api/login/-red)
+`POST api/login/`
 #### Request
 ```
 POST /api/token/ HTTP/1.1
