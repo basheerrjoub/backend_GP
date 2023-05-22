@@ -76,13 +76,14 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
         "NAME": "mealDB",
         "USER": "root",
-        "PASSWORD": "1122",
-        "HOST": "localhost",  # Or an IP Address that your DB is hosted on
+        "PASSWORD": "0568246163",
+        "HOST": "mealdb.cq7wvtr3esnr.eu-north-1.rds.amazonaws.com",
         "PORT": "3306",
     }
 }
