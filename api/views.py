@@ -83,3 +83,24 @@ class RegisterView(generics.GenericAPIView):
                 "message": "User Created Successfully.  Now perform Login to get your token",
             }
         )
+
+
+from rest_framework.views import APIView
+from rest_framework.exceptions import NotFound
+from .recommendations import (
+    recommend_meals,
+)  # Assuming recommend_meals function is in recommendations.py
+
+
+class RecommendationsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        user_id = request.user.id
+        try:
+            recommended_meals = recommend_meals(user_id)
+        except User.DoesNotExist:
+            raise NotFound("User does not exist")
+
+        serializer = MealSerializer(recommended_meals, many=True)
+        return Response(serializer.data)

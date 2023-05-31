@@ -13,4 +13,5 @@ urlpatterns = [
     path("register/", RegisterView.as_view(), name="register_new_user"),
     path("answers/", AnswersView.as_view(), name="add_questionaire"),
     path("questions/", QuestionsView.as_view(), name="view_questions"),
+    path("recommendations/", RecommendationsView.as_view(), name="recommendations"),
 ]
