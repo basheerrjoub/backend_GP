@@ -1,5 +1,8 @@
 from rest_framework import serializers
 from .models import *
+from rest_framework.exceptions import APIException
+from django.db import IntegrityError
+from rest_framework import status
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -36,6 +39,32 @@ class SuggestionsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Suggestions
         fields = "__all__"
+
+
+class QuestionsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Questions
+        fields = "__all__"
+
+
+class AnswersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Answers
+        fields = ["user_question_id", "question", "question_answer"]
+        read_only_fields = ("user_question_id",)
+
+    def create(self, validated_data):
+        try:
+            # Get the user from the request
+            user = self.context["request"].user.id
+
+            # Create a new Answer object
+            answer = Answers.objects.create(user_id=user, **validated_data)
+
+            return answer
+
+        except IntegrityError:
+            raise APIException("Duplicate entry", code=status.HTTP_400_BAD_REQUEST)
 
 
 class RegisterSerializer(serializers.ModelSerializer):

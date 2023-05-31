@@ -4,6 +4,7 @@ from .models import *
 from .serializers import *
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from rest_framework.response import Response
+from rest_framework import status
 
 
 class UserList(generics.ListCreateAPIView):
@@ -36,6 +37,33 @@ class SuggestionsList(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return Meal.objects.filter(suggestions__user=user)
+
+
+class QuestionsView(generics.ListAPIView):
+    serializer_class = QuestionsSerializer
+    queryset = Questions.objects.all()
+    permission_classes = [IsAuthenticated]
+
+
+class AnswersView(generics.ListCreateAPIView):
+    serializer_class = AnswersSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Answers.objects.filter(user=user)
+
+    def update(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        for item_data in request.data:
+            question_id = item_data.get("question_id")
+            answer_text = item_data.get("question_answer")
+
+            answer, created = queryset.update_or_create(
+                question_id=question_id, defaults={"question_answer": answer_text}
+            )
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class RegisterView(generics.GenericAPIView):

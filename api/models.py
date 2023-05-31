@@ -80,6 +80,17 @@ class Meal(models.Model):
         return self.meal_name
 
 
+class Questions(models.Model):
+    question_id = models.IntegerField(primary_key=True)
+    question_desc = models.CharField(max_length=1000)
+
+    class Meta:
+        db_table = "questions"
+
+    def __str__(self):
+        return self.question_desc
+
+
 class Suggestions(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     meal = models.ForeignKey(Meal, on_delete=models.CASCADE)
@@ -91,3 +102,17 @@ class Suggestions(models.Model):
 
     def __str__(self):
         return f"Suggestion: {self.meal.meal_name} for User: {self.user.username}"
+
+
+class Answers(models.Model):
+    user_question_id = models.IntegerField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    question = models.ForeignKey(Questions, on_delete=models.CASCADE)
+    question_answer = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = "user_question"
+        unique_together = (("user_id", "question_id"),)
+
+    def __str__(self):
+        return f"Question ID: {self.question_id} Answer: {self.question_answer}"
