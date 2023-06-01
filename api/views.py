@@ -95,10 +95,11 @@ from .recommendations import (
 class RecommendationsView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, format=None):
+    def get(self, request, type, format=None):
         user_id = request.user.id
+        print(f"Recommend : {type}")
         try:
-            recommended_meals = recommend_meals(user_id)
+            recommended_meals = recommend_meals(user_id, mealType=type)
         except User.DoesNotExist:
             raise NotFound("User does not exist")
 

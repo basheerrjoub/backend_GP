@@ -86,6 +86,8 @@ class Questions(models.Model):
 
     class Meta:
         db_table = "questions"
+        verbose_name = "Question"
+        verbose_name_plural = "Questions"
 
     def __str__(self):
         return self.question_desc
@@ -112,6 +114,8 @@ class Answers(models.Model):
 
     class Meta:
         db_table = "user_question"
+        verbose_name = "Answer"
+        verbose_name_plural = "Answers"
         unique_together = (("user_id", "question_id"),)
 
     def __str__(self):
