@@ -26,7 +26,6 @@ class UserAdmin(BaseUserAdmin):
                 )
             },
         ),
-        ("Important dates", {"fields": ("last_login", "date_joined")}),
     )
     add_fieldsets = (
         (
