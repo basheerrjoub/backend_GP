@@ -52,13 +52,13 @@ def recommend_meals(user_id, mealType):
     # Filter For the meal's type:
     all_meals = None
     if mealType == "dinner":
-        all_meals = Meal.objects.filter(dinner=1)
+        all_meals = Meal.objects.filter(dinner=1, vegan=vegan)
     elif mealType == "lunch":
-        all_meals = Meal.objects.filter(lunch=1)
+        all_meals = Meal.objects.filter(lunch=1, vegan=vegan)
     elif mealType == "breakfast":
-        all_meals = Meal.objects.filter(breakfast=1)
+        all_meals = Meal.objects.filter(breakfast=1, vegan=vegan)
     elif mealType == "snack":
-        all_meals = Meal.objects.filter(snack=1)
+        all_meals = Meal.objects.filter(snack=1, vegan=vegan)
     else:  # Get all the meals without specification
         all_meals = Meal.objects.all()
 
