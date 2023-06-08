@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "api",
+    "storages",
 ]
 
 MIDDLEWARE = [
@@ -142,3 +143,17 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=120),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
+
+
+AWS_ACCESS_KEY_ID = "AKIAZ6NXMRKKXK6J5Y4X"
+AWS_SECRET_ACCESS_KEY = "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"
+AWS_STORAGE_BUCKET_NAME = "basheergraduationproject"
+AWS_S3_SIGNATURE_VERSION = "s3v4"
+AWS_S3_REGION_NAME = "eu-north-1"
+GS_BUCKET_NAME = "django_storage_graduation_prokect"
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None
+AWS_S3_VERIFY = True
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+AWS_S3_ADDRESSING_STYLE = "virtual"
+AWS_QUERYSTRING_AUTH = False

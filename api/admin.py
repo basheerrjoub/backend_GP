@@ -55,6 +55,8 @@ class MealAdmin(admin.ModelAdmin):
         "salty",
         "sweety",
         "spicy",
+        "image",
+        "vegan",
     )
     search_fields = ("meal_name",)
 

@@ -72,6 +72,8 @@ class Meal(models.Model):
     salty = models.IntegerField()
     sweety = models.IntegerField()
     spicy = models.IntegerField()
+    image = models.ImageField(upload_to="meals/", blank=True, null=True)
+    vegan = models.IntegerField()
 
     class Meta:
         db_table = "meal"
