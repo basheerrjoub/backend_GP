@@ -81,3 +81,15 @@ class RegisterSerializer(serializers.ModelSerializer):
             last_name=validated_data["last_name"],
         )
         return user
+
+
+class DailyCalorieIntakeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DailyCalorieIntake
+        fields = ["date", "total_recommended_calories", "total_consumed_calories"]
+
+
+class RatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rating
+        fields = ["meal", "rating"]

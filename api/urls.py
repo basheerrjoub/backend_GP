@@ -18,4 +18,12 @@ urlpatterns = [
         RecommendationsView.as_view(),
         name="recommendations",
     ),
+    path("consumed/", report_consumed_meal_view),
+    path(
+        "daily_calorie_intake/",
+        DailyCalorieIntakeView.as_view(),
+        name="daily_calorie_intake",
+    ),
+    path("rate/", RatingView.as_view(), name="rate-meal"),
+    path("average-rating/<int:meal_id>/", RatingView.as_view(), name="average-rating"),
 ]

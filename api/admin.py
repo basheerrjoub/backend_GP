@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, Meal, Questions, Answers
+from .models import *
 
 
 class UserAdmin(BaseUserAdmin):
@@ -57,6 +57,7 @@ class MealAdmin(admin.ModelAdmin):
         "spicy",
         "image",
         "vegan",
+        "calories",
     )
     search_fields = ("meal_name",)
 
@@ -71,6 +72,26 @@ class AnswersAdmin(admin.ModelAdmin):
     search_fields = ("user__username", "question__question_desc", "question_answer")
 
 
+class DailyCalorieIntakeAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "user_id",
+        "date",
+        "total_recommended_calories",
+        "total_consumed_calories",
+    )
+    search_fields = ("user_id",)
+
+
+class RatingAdmin(admin.ModelAdmin):
+    list_display = ("user", "meal", "rating")
+    list_filter = ("user", "meal")
+    search_fields = ("user__username", "meal__meal_name")
+
+
+admin.site.register(Rating, RatingAdmin)
+
+admin.site.register(DailyCalorieIntake, DailyCalorieIntakeAdmin)
 admin.site.register(Meal, MealAdmin)
 admin.site.register(User, UserAdmin)
 admin.site.register(Questions, QuestionsAdmin)

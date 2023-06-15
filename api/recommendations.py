@@ -1,5 +1,7 @@
 from sklearn.metrics.pairwise import cosine_similarity
 from .models import *
+from .models import DailyCalorieIntake
+from .calculations import calculateTDEE
 
 
 def get_user_vector(user_id):
@@ -36,6 +38,21 @@ def get_meal_vector(meal_id):
 
 
 def recommend_meals(user_id, mealType):
+    calculateTDEE(user_id)
+    # How much the user should have calories
+    today = timezone.now().date()
+    daily_intake = DailyCalorieIntake.objects.filter(
+        user_id=user_id, date=today
+    ).first()
+    calories_already_consumed = 0
+    calories_already_consumed = 0
+    daily_calorie_limit = 3000
+    if daily_intake:
+        calories_already_consumed = daily_intake.total_consumed_calories
+        daily_calorie_limit = daily_intake.total_recommended_calories
+
+    remaining_calories = daily_calorie_limit - calories_already_consumed
+
     user_vector = get_user_vector(user_id)
     # Filter if the user is vegan or not:
     currentUser = User.objects.get(id=user_id)
@@ -64,12 +81,18 @@ def recommend_meals(user_id, mealType):
 
     similarities = []
     for meal in all_meals:
-        meal_vector = get_meal_vector(meal.meal_id)
-        similarity = cosine_similarity([user_vector], [meal_vector])[0][0]
-        similarities.append((meal, similarity))
+        if meal.calories <= remaining_calories:
+            meal_vector = get_meal_vector(meal.meal_id)
+            similarity = cosine_similarity([user_vector], [meal_vector])[0][0]
+            similarities.append((meal, similarity))
 
-    # return the top 5 most similar meals
     sorted_similarities = sorted(similarities, key=lambda x: x[1], reverse=True)
-    recommended_meals = [meal[0] for meal in sorted_similarities[:5]]
+
+    recommended_meals = []
+    total_calories = 0
+    for meal, similarity in sorted_similarities:
+        if total_calories + meal.calories <= remaining_calories:
+            recommended_meals.append(meal)
+            total_calories += meal.calories
 
     return recommended_meals

@@ -74,6 +74,7 @@ class Meal(models.Model):
     spicy = models.IntegerField()
     image = models.ImageField(upload_to="meals/", blank=True, null=True)
     vegan = models.IntegerField()
+    calories = models.IntegerField()
 
     class Meta:
         db_table = "meal"
@@ -122,3 +123,33 @@ class Answers(models.Model):
 
     def __str__(self):
         return f"Question ID: {self.question_id} Answer: {self.question_answer}"
+
+
+from django.utils import timezone
+
+
+class DailyCalorieIntake(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField(default=timezone.now)
+    total_recommended_calories = models.IntegerField(default=0)
+    total_consumed_calories = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = "daily_calorie_intake"
+        unique_together = (("user", "date"),)
+
+    def __str__(self):
+        return f"Daily calorie intake for {self.user.username} on {self.date}"
+
+
+class Rating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    meal = models.ForeignKey(Meal, on_delete=models.CASCADE)
+    rating = models.IntegerField()
+
+    class Meta:
+        db_table = "rating"
+        unique_together = (("user", "meal"),)
+
+    def __str__(self):
+        return f"Rating for {self.user.username} on Meal: {self.meal.meal_name}"
