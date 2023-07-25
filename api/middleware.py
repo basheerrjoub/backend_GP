@@ -7,9 +7,13 @@ class DebugPrintMiddleware:
         headers = {k: v for k, v in request.META.items() if k.startswith("HTTP_")}
         print("Headers:", headers)
 
-        # Print request body
-        body = request.body.decode("utf-8") if request.body else "No body"
-        print("Body:", body)
+        # Print request body only if not multipart
+        if (
+            request.method in ["POST", "PUT", "PATCH"]
+            and request.content_type != "multipart/form-data"
+        ):
+            body = request.body.decode("utf-8") if request.body else "No body"
+            print("Body:", body)
 
         # Get response
         response = self.get_response(request)

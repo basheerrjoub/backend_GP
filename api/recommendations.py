@@ -53,18 +53,21 @@ def recommend_meals(user_id, mealType):
         user_id=user_id, date=today
     ).first()
     calories_already_consumed = 0
-    daily_calorie_limit = 3000000
+    daily_calorie_limit = 3000
     if daily_intake:
         calories_already_consumed = daily_intake.total_consumed_calories
         daily_calorie_limit = daily_intake.total_recommended_calories
 
     remaining_calories = daily_calorie_limit - calories_already_consumed
+    remaining_calories = 100000 - calories_already_consumed
 
     user_vector = get_user_vector(user_id)
     # Filter if the user is vegan or not:
-    currentUser = User.objects.get(id=user_id)
     questionVegan = Questions.objects.get(question_desc="Are you vegan?")
-    answer = Answers.objects.get(user=currentUser, question=questionVegan)
+    answer = Answers.objects.select_related("user").get(
+        user_id=user_id, question=questionVegan
+    )
+
     vegan = 0
     if answer.question_answer.lower() == "yes":
         vegan = 1

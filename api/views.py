@@ -223,7 +223,21 @@ class RatingView(APIView):
     def post(self, request):
         serializer = RatingSerializer(data=request.data)
         if serializer.is_valid():
-            rating = serializer.save(user=request.user)
+            data = serializer.validated_data
+            # Check if a Rating object with the same user and meal already exists
+            rating, created = Rating.objects.get_or_create(
+                user=request.user,
+                meal=data.get("meal"),
+                defaults={"rating": data.get("rating")},
+            )
+            # If a Rating object already exists, update the rating
+            if not created:
+                rating.rating = data.get("rating")
+                rating.save()
+
+            # Serialize the rating instance to return in the response
+            serializer = RatingSerializer(rating)
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -310,3 +324,52 @@ class DeleteConsumedMealView(generics.DestroyAPIView):
         for consumed_meal in consumed_meals:
             consumed_meal.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ItemListView(APIView):
+    def get(self, request):
+        items = Item.objects.all().values("item_id", "item_name", "weight", "cal")
+        serializer = ItemSerializer(items, many=True)
+        return Response(serializer.data)
+
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Item, Meal, MealItem
+from .serializers import ItemSerializer
+
+
+class SaveMealItemView(APIView):
+    def post(self, request, format=None):
+        item_id = request.data.get("item_id")
+        meal_id = request.data.get("meal_id")
+        weight = request.data.get("weight")
+
+        if not item_id or not meal_id or not weight:
+            return Response(
+                {"error": "Item ID, Meal ID, and Weight are required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            item = Item.objects.get(pk=item_id)
+            meal = Meal.objects.get(pk=meal_id)
+        except Item.DoesNotExist:
+            return Response(
+                {"error": "Item not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except Meal.DoesNotExist:
+            return Response(
+                {"error": "Meal not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        meal_item = MealItem(item=item, meal=meal, weight=float(weight))
+        meal_item.save()
+
+        return Response(
+            {"message": "MealItem saved successfully."},
+            status=status.HTTP_201_CREATED,
+        )

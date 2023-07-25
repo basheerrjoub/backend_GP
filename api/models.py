@@ -178,7 +178,6 @@ class Item(models.Model):
 
 
 class MealItem(models.Model):
-    id = models.AutoField(primary_key=True)
     meal = models.ForeignKey(Meal, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     weight = models.FloatField()

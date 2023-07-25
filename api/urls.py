@@ -36,4 +36,6 @@ urlpatterns = [
         DeleteConsumedMealView.as_view(),
         name="delete_consumed_meal",
     ),
+    path("items/", ItemListView.as_view(), name="items"),
+    path("save_meal_item/", SaveMealItemView.as_view(), name="save_meal_item"),
 ]

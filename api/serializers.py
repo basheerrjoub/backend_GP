@@ -99,3 +99,9 @@ class ConsumedMealSerializer(serializers.ModelSerializer):
     class Meta:
         model = ConsumedMeal
         fields = ["user", "meal", "consumed"]
+
+
+class ItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Item
+        fields = ("item_id", "item_name", "weight", "cal")
