@@ -130,7 +130,7 @@ from django.utils import timezone
 
 class DailyCalorieIntake(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    date = models.DateField(default=timezone.now)
+    date = models.DateField()
     total_recommended_calories = models.IntegerField(default=0)
     total_consumed_calories = models.IntegerField(default=0)
 
@@ -153,3 +153,47 @@ class Rating(models.Model):
 
     def __str__(self):
         return f"Rating for {self.user.username} on Meal: {self.meal.meal_name}"
+
+
+class Item(models.Model):
+    item_id = models.AutoField(primary_key=True)
+    item_name = models.CharField(max_length=100)
+    item_desc = models.CharField(max_length=500)
+    weight = models.DecimalField(max_digits=5, decimal_places=2)
+    protein = models.DecimalField(max_digits=5, decimal_places=2)
+    fat = models.DecimalField(max_digits=5, decimal_places=2)
+    carbs = models.DecimalField(max_digits=5, decimal_places=2)
+    cal = models.DecimalField(max_digits=5, decimal_places=2)
+    sugar = models.DecimalField(max_digits=5, decimal_places=2)
+    vegan = models.BooleanField(default=False)
+    vegetarian = models.BooleanField(default=False)
+    bread = models.BooleanField(default=False)
+    rice = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "items"
+
+    def __str__(self):
+        return self.item_name
+
+
+class MealItem(models.Model):
+    id = models.AutoField(primary_key=True)
+    meal = models.ForeignKey(Meal, on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    weight = models.FloatField()
+
+    class Meta:
+        db_table = "meal_item"
+
+
+class ConsumedMeal(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    meal = models.ForeignKey(Meal, on_delete=models.CASCADE)
+    consumed = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "consumed_meal"
+
+    def __str__(self):
+        return f"{self.user.username} - {self.meal.meal_name}"

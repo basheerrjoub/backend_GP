@@ -23,7 +23,13 @@ def get_user_vector(user_id):
     return user_vector
 
 
+meal_vectors_cache = {}
+
+
 def get_meal_vector(meal_id):
+    if meal_id in meal_vectors_cache:
+        return meal_vectors_cache[meal_id]
+
     meal = Meal.objects.get(meal_id=meal_id)
 
     meal_vector = [
@@ -33,6 +39,8 @@ def get_meal_vector(meal_id):
         meal.salty,
         meal.hard,
     ]
+
+    meal_vectors_cache[meal_id] = meal_vector
 
     return meal_vector
 
@@ -45,8 +53,7 @@ def recommend_meals(user_id, mealType):
         user_id=user_id, date=today
     ).first()
     calories_already_consumed = 0
-    calories_already_consumed = 0
-    daily_calorie_limit = 3000
+    daily_calorie_limit = 3000000
     if daily_intake:
         calories_already_consumed = daily_intake.total_consumed_calories
         daily_calorie_limit = daily_intake.total_recommended_calories

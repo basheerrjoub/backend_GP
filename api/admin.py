@@ -80,6 +80,7 @@ class DailyCalorieIntakeAdmin(admin.ModelAdmin):
         "total_recommended_calories",
         "total_consumed_calories",
     )
+
     search_fields = ("user_id",)
 
 
