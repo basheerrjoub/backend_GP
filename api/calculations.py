@@ -58,3 +58,22 @@ def calculateTDEE(user_id):
         daily_calorie_intake.save()
 
     print(f"TDEE: {tdee}")
+
+
+def calculateBMI(user_id):
+    currentUser = User.objects.get(id=user_id)
+
+    # weight
+    questionWeight = Questions.objects.get(question_desc="Please provide your weight:")
+    weightAnswer = Answers.objects.get(user=currentUser, question=questionWeight)
+    weight = int(weightAnswer.question_answer)
+
+    # height
+    questionHeight = Questions.objects.get(question_desc="Please provide your height:")
+    heightAnswer = Answers.objects.get(user=currentUser, question=questionHeight)
+    height = int(heightAnswer.question_answer) / 100  # Convert height to meters
+
+    # Calculate BMI
+    bmi = weight / (height * height)
+
+    return bmi

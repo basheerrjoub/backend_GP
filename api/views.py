@@ -373,3 +373,71 @@ class SaveMealItemView(APIView):
             {"message": "MealItem saved successfully."},
             status=status.HTTP_201_CREATED,
         )
+
+
+from django.db.models import Sum
+
+
+class MealProteinView(APIView):
+    def get(self, request, meal_id):
+        try:
+            meal_items = MealItem.objects.filter(meal_id=meal_id).select_related("item")
+            total_protein = meal_items.aggregate(total_protein=Sum("item__protein"))[
+                "total_protein"
+            ]
+            return Response({"total_protein": total_protein})
+        except MealItem.DoesNotExist:
+            return Response({"error": "Meal not found."}, status=404)
+
+
+class UserProteinView(APIView):
+    def get(self, request):
+        consumed_meals = ConsumedMeal.objects.filter(user=request.user, consumed=True)
+        meal_ids = [meal.meal_id for meal in consumed_meals]
+
+        total_protein = MealItem.objects.filter(meal_id__in=meal_ids).aggregate(
+            total_protein=Sum("item__protein")
+        )["total_protein"]
+
+        return Response({"total_protein": total_protein})
+
+
+class UserCarbsView(APIView):
+    def get(self, request):
+        consumed_meals = ConsumedMeal.objects.filter(user=request.user, consumed=True)
+        meal_ids = [meal.meal_id for meal in consumed_meals]
+
+        total_carbs = MealItem.objects.filter(meal_id__in=meal_ids).aggregate(
+            total_carbs=Sum("item__carbs")
+        )["total_carbs"]
+
+        return Response({"total_carbs": total_carbs})
+
+
+class UserFatView(APIView):
+    def get(self, request):
+        consumed_meals = ConsumedMeal.objects.filter(user=request.user, consumed=True)
+        meal_ids = [meal.meal_id for meal in consumed_meals]
+
+        total_fat = MealItem.objects.filter(meal_id__in=meal_ids).aggregate(
+            total_fat=Sum("item__fat")
+        )["total_fat"]
+
+        return Response({"total_fat": total_fat})
+
+
+class HeightWeightView(generics.RetrieveAPIView):
+    serializer_class = HeightWeightSerializer
+
+    def get_object(self):
+        return Answers()
+
+
+from .calculations import *
+
+
+class BMIView(APIView):
+    def get(self, request, *args, **kwargs):
+        user_id = request.user.id
+        bmi = calculateBMI(user_id)
+        return Response({"BMI": bmi})

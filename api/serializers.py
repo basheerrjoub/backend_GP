@@ -105,3 +105,28 @@ class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = ("item_id", "item_name", "weight", "cal")
+
+
+class HeightWeightSerializer(serializers.ModelSerializer):
+    height = serializers.SerializerMethodField()
+    weight = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Answers
+        fields = ["height", "weight"]
+
+    def get_height(self, obj):
+        try:
+            return Answers.objects.get(
+                user=self.context["request"].user, question_id=4
+            ).question_answer
+        except Answers.DoesNotExist:
+            return None
+
+    def get_weight(self, obj):
+        try:
+            return Answers.objects.get(
+                user=self.context["request"].user, question_id=5
+            ).question_answer
+        except Answers.DoesNotExist:
+            return None
