@@ -377,16 +377,64 @@ class SaveMealItemView(APIView):
 
 from django.db.models import Sum
 
+from django.db.models import Sum, F, FloatField, DecimalField
+from django.db.models.functions import Cast
+from django.db.models import ExpressionWrapper
 
-class MealProteinView(APIView):
+
+class MealNutritionView(APIView):
     def get(self, request, meal_id):
         try:
+            # Get all the items for a particular meal
             meal_items = MealItem.objects.filter(meal_id=meal_id).select_related("item")
-            total_protein = meal_items.aggregate(total_protein=Sum("item__protein"))[
-                "total_protein"
-            ]
-            return Response({"total_protein": total_protein})
+
+            # Calculate the protein, carbs, fat and calories for each item in the meal and then aggregate
+            aggregated_content = meal_items.annotate(
+                protein_content=ExpressionWrapper(
+                    (Cast(F("weight"), FloatField()) / F("item__weight"))
+                    * F("item__protein"),
+                    output_field=DecimalField(),
+                ),
+                carbs_content=ExpressionWrapper(
+                    (Cast(F("weight"), FloatField()) / F("item__weight"))
+                    * F("item__carbs"),
+                    output_field=DecimalField(),
+                ),
+                fat_content=ExpressionWrapper(
+                    (Cast(F("weight"), FloatField()) / F("item__weight"))
+                    * F("item__fat"),
+                    output_field=DecimalField(),
+                ),
+                cal_content=ExpressionWrapper(
+                    (Cast(F("weight"), FloatField()) / F("item__weight"))
+                    * F("item__cal"),
+                    output_field=DecimalField(),
+                ),
+            ).aggregate(
+                total_protein=Sum("protein_content"),
+                total_carbs=Sum("carbs_content"),
+                total_fat=Sum("fat_content"),
+                total_cal=Sum("cal_content"),
+            )
+
+            # Update meal's calories
+            meal = Meal.objects.get(meal_id=meal_id)
+            meal.calories = round(aggregated_content["total_cal"] / 5, 0)
+            meal.save()
+
+            return Response(
+                {
+                    "total_protein": round(aggregated_content["total_protein"] / 5, 0),
+                    "total_carbs": round(aggregated_content["total_carbs"] / 5, 0),
+                    "total_fat": round(aggregated_content["total_fat"] / 5, 0),
+                    "total_cal": meal.calories,
+                }
+            )
+
         except MealItem.DoesNotExist:
+            return Response({"error": "Meal not found."}, status=404)
+
+        except Meal.DoesNotExist:
             return Response({"error": "Meal not found."}, status=404)
 
 
@@ -399,7 +447,7 @@ class UserProteinView(APIView):
             total_protein=Sum("item__protein")
         )["total_protein"]
 
-        return Response({"total_protein": total_protein})
+        return Response({"total_protein": total_protein / 5})
 
 
 class UserCarbsView(APIView):
@@ -411,7 +459,7 @@ class UserCarbsView(APIView):
             total_carbs=Sum("item__carbs")
         )["total_carbs"]
 
-        return Response({"total_carbs": total_carbs})
+        return Response({"total_carbs": total_carbs / 5})
 
 
 class UserFatView(APIView):
@@ -423,7 +471,7 @@ class UserFatView(APIView):
             total_fat=Sum("item__fat")
         )["total_fat"]
 
-        return Response({"total_fat": total_fat})
+        return Response({"total_fat": total_fat / 5})
 
 
 class HeightWeightView(generics.RetrieveAPIView):

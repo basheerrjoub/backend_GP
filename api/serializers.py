@@ -54,17 +54,20 @@ class AnswersSerializer(serializers.ModelSerializer):
         read_only_fields = ("user_question_id",)
 
     def create(self, validated_data):
-        try:
-            # Get the user from the request
-            user = self.context["request"].user.id
+        # Get the user from the request
+        user = self.context["request"].user
 
-            # Create a new Answer object
-            answer = Answers.objects.create(user_id=user, **validated_data)
+        # Get question from validated_data
+        question = validated_data.get("question")
 
-            return answer
+        # Get or create a new Answer object
+        answer, created = Answers.objects.update_or_create(
+            user=user,
+            question=question,
+            defaults={"question_answer": validated_data.get("question_answer")},
+        )
 
-        except IntegrityError:
-            raise APIException("Duplicate entry", code=status.HTTP_400_BAD_REQUEST)
+        return answer
 
 
 class RegisterSerializer(serializers.ModelSerializer):

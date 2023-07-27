@@ -38,7 +38,11 @@ urlpatterns = [
     ),
     path("items/", ItemListView.as_view(), name="items"),
     path("save_meal_item/", SaveMealItemView.as_view(), name="save_meal_item"),
-    path("meal_protein/<int:meal_id>/", MealProteinView.as_view(), name="meal-protein"),
+    path(
+        "meal_nutrition/<int:meal_id>/",
+        MealNutritionView.as_view(),
+        name="meal-protein",
+    ),
     path("consumed_meals_protein/", UserProteinView.as_view(), name="user-protein"),
     path("consumed_meals_carbs/", UserCarbsView.as_view(), name="user-carbs"),
     path("consumed_meals_fat/", UserFatView.as_view(), name="user-fat"),

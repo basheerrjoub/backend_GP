@@ -68,7 +68,7 @@ def recommend_meals(user_id, mealType):
         user_id=user_id, question=questionVegan
     )
 
-    vegan = 0
+    vegan = None
     if answer.question_answer.lower() == "yes":
         vegan = 1
 
@@ -77,17 +77,24 @@ def recommend_meals(user_id, mealType):
     # But First add the Vegan attribute to the meal table
     #
     # Filter For the meal's type:
-    all_meals = None
-    if mealType == "dinner":
-        all_meals = Meal.objects.filter(dinner=1, vegan=vegan)
-    elif mealType == "lunch":
-        all_meals = Meal.objects.filter(lunch=1, vegan=vegan)
-    elif mealType == "breakfast":
-        all_meals = Meal.objects.filter(breakfast=1, vegan=vegan)
-    elif mealType == "snack":
-        all_meals = Meal.objects.filter(snack=1, vegan=vegan)
-    else:  # Get all the meals without specification
-        all_meals = Meal.objects.all()
+    if vegan is not None:  # vegan filter is only applied when the user is vegan
+        if mealType == "dinner":
+            all_meals = Meal.objects.filter(dinner=1, vegan=vegan)
+        elif mealType == "lunch":
+            all_meals = Meal.objects.filter(lunch=1, vegan=vegan)
+        elif mealType == "breakfast":
+            all_meals = Meal.objects.filter(breakfast=1, vegan=vegan)
+        elif mealType == "snack":
+            all_meals = Meal.objects.filter(snack=1, vegan=vegan)
+    else:
+        if mealType == "dinner":
+            all_meals = Meal.objects.filter(dinner=1)
+        elif mealType == "lunch":
+            all_meals = Meal.objects.filter(lunch=1)
+        elif mealType == "breakfast":
+            all_meals = Meal.objects.filter(breakfast=1)
+        elif mealType == "snack":
+            all_meals = Meal.objects.filter(snack=1)
 
     similarities = []
     for meal in all_meals:
@@ -97,7 +104,7 @@ def recommend_meals(user_id, mealType):
             similarities.append((meal, similarity))
 
     sorted_similarities = sorted(similarities, key=lambda x: x[1], reverse=True)
-
+    print("Length: ", len(all_meals), "Vegan", vegan)
     recommended_meals = []
     total_calories = 0
     for meal, similarity in sorted_similarities:

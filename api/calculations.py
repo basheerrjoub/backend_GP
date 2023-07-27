@@ -22,13 +22,13 @@ def calculateTDEE(user_id):
     questionWeight = Questions.objects.get(question_desc="Please provide your weight:")
     weightAnswer = Answers.objects.get(user=currentUser, question=questionWeight)
 
-    weight = int(weightAnswer.question_answer)
+    weight = int(float(weightAnswer.question_answer))
 
     # height
     questionHeight = Questions.objects.get(question_desc="Please provide your height:")
     heightAnswer = Answers.objects.get(user=currentUser, question=questionHeight)
 
-    height = int(heightAnswer.question_answer)
+    height = int(float(heightAnswer.question_answer))
 
     # Age
     questionAge = Questions.objects.get(question_desc="Date of Birth")
@@ -66,12 +66,12 @@ def calculateBMI(user_id):
     # weight
     questionWeight = Questions.objects.get(question_desc="Please provide your weight:")
     weightAnswer = Answers.objects.get(user=currentUser, question=questionWeight)
-    weight = int(weightAnswer.question_answer)
+    weight = int(float(weightAnswer.question_answer))
 
     # height
     questionHeight = Questions.objects.get(question_desc="Please provide your height:")
     heightAnswer = Answers.objects.get(user=currentUser, question=questionHeight)
-    height = int(heightAnswer.question_answer) / 100  # Convert height to meters
+    height = int(float(heightAnswer.question_answer)) / 100  # Convert height to meters
 
     # Calculate BMI
     bmi = weight / (height * height)
