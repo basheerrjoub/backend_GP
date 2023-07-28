@@ -419,14 +419,14 @@ class MealNutritionView(APIView):
 
             # Update meal's calories
             meal = Meal.objects.get(meal_id=meal_id)
-            meal.calories = round(aggregated_content["total_cal"] / 5, 0)
+            meal.calories = round(aggregated_content["total_cal"] / 8, 0)
             meal.save()
 
             return Response(
                 {
-                    "total_protein": round(aggregated_content["total_protein"] / 5, 0),
-                    "total_carbs": round(aggregated_content["total_carbs"] / 5, 0),
-                    "total_fat": round(aggregated_content["total_fat"] / 5, 0),
+                    "total_protein": round(aggregated_content["total_protein"] / 8, 0),
+                    "total_carbs": round(aggregated_content["total_carbs"] / 8, 0),
+                    "total_fat": round(aggregated_content["total_fat"] / 8, 0),
                     "total_cal": meal.calories,
                 }
             )
