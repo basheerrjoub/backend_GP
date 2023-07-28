@@ -443,11 +443,19 @@ class UserProteinView(APIView):
         consumed_meals = ConsumedMeal.objects.filter(user=request.user, consumed=True)
         meal_ids = [meal.meal_id for meal in consumed_meals]
 
-        total_protein = MealItem.objects.filter(meal_id__in=meal_ids).aggregate(
-            total_protein=Sum("item__protein")
-        )["total_protein"]
+        meal_items = MealItem.objects.filter(meal_id__in=meal_ids).select_related(
+            "item"
+        )
 
-        return Response({"total_protein": total_protein / 5})
+        total_protein = meal_items.annotate(
+            protein_content=ExpressionWrapper(
+                (Cast(F("weight"), FloatField()) / F("item__weight"))
+                * F("item__protein"),
+                output_field=DecimalField(),
+            )
+        ).aggregate(total_protein=Sum("protein_content"))["total_protein"]
+
+        return Response({"total_protein": round(total_protein / 5, 0)})
 
 
 class UserCarbsView(APIView):
@@ -455,11 +463,19 @@ class UserCarbsView(APIView):
         consumed_meals = ConsumedMeal.objects.filter(user=request.user, consumed=True)
         meal_ids = [meal.meal_id for meal in consumed_meals]
 
-        total_carbs = MealItem.objects.filter(meal_id__in=meal_ids).aggregate(
-            total_carbs=Sum("item__carbs")
-        )["total_carbs"]
+        meal_items = MealItem.objects.filter(meal_id__in=meal_ids).select_related(
+            "item"
+        )
 
-        return Response({"total_carbs": total_carbs / 5})
+        total_carbs = meal_items.annotate(
+            carbs_content=ExpressionWrapper(
+                (Cast(F("weight"), FloatField()) / F("item__weight"))
+                * F("item__carbs"),
+                output_field=DecimalField(),
+            )
+        ).aggregate(total_carbs=Sum("carbs_content"))["total_carbs"]
+
+        return Response({"total_carbs": round(total_carbs / 5, 0)})
 
 
 class UserFatView(APIView):
@@ -467,11 +483,18 @@ class UserFatView(APIView):
         consumed_meals = ConsumedMeal.objects.filter(user=request.user, consumed=True)
         meal_ids = [meal.meal_id for meal in consumed_meals]
 
-        total_fat = MealItem.objects.filter(meal_id__in=meal_ids).aggregate(
-            total_fat=Sum("item__fat")
-        )["total_fat"]
+        meal_items = MealItem.objects.filter(meal_id__in=meal_ids).select_related(
+            "item"
+        )
 
-        return Response({"total_fat": total_fat / 5})
+        total_fat = meal_items.annotate(
+            fat_content=ExpressionWrapper(
+                (Cast(F("weight"), FloatField()) / F("item__weight")) * F("item__fat"),
+                output_field=DecimalField(),
+            )
+        ).aggregate(total_fat=Sum("fat_content"))["total_fat"]
+
+        return Response({"total_fat": round(total_fat / 5, 0)})
 
 
 class HeightWeightView(generics.RetrieveAPIView):
