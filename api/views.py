@@ -306,7 +306,7 @@ class DeleteConsumedMealView(generics.DestroyAPIView):
     def delete(self, request, *args, **kwargs):
         meal_id = request.data.get("meal_id")  # get meal id from the request data
         user_id = request.user.id  # get the user id from the request
-
+        delete_consumed(user_id, meal_id)
         # check for user and meal id
         if not meal_id:
             return Response(
@@ -489,3 +489,18 @@ class BMIView(APIView):
         user_id = request.user.id
         bmi = calculateBMI(user_id)
         return Response({"BMI": bmi})
+
+
+# Delete calories from the deleted Meal:
+
+
+def delete_consumed(user_id, meal_id):
+    meal = Meal.objects.get(meal_id=meal_id)
+    today = timezone.localtime().date()
+    daily_intake, created = DailyCalorieIntake.objects.get_or_create(
+        user_id=user_id, date=today
+    )
+    if created:
+        daily_intake.date = today
+    daily_intake.total_consumed_calories -= meal.calories
+    daily_intake.save()
